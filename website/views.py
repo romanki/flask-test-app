@@ -4,6 +4,7 @@ from .models import Note
 from . import db
 import json
 
+
 views = Blueprint('views', __name__)
 
 
@@ -35,3 +36,5 @@ def delete_note():
             db.session.commit()
 
     return jsonify({})
+
+

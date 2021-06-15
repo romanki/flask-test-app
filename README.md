@@ -1,6 +1,6 @@
 # Flask Test Web App
 
-## Setup & Installtion
+## Setup & Installtion manual steps
 
 ```bash
 git clone <repo-url>
@@ -25,3 +25,24 @@ python main.py
 ## Viewing The App
 
 Go to `http://127.0.0.1:5000`
+
+## Setup & Installtion docker-compose
+
+```bash
+docker-compose up -d --build
+```
+Go to `http://127.0.0.1:5000`
+
+## Setup & Installtion with Helm to k8s
+
+```bash
+./install-helms.sh
+```
+
+To access to k8s services need ingress and services configs in your kubernetes cluster.
+
+## To check in minikube
+```bash
+minikube service --url flask-test-app
+```
+And use URL provided, for example: http://127.0.0.1:59786

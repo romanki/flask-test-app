@@ -1,0 +1,44 @@
+image:
+  repository: bitnami/postgresql
+  tag: 11.9.0-debian-10-r48
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets:
+  #   - myRegistryKeySecretName
+
+  ## Set to true if you would like to see extra information on logs
+  ## It turns BASH and NAMI debugging in minideb
+  ## ref:  https://github.com/bitnami/minideb-extras/#turn-on-bash-debugging
+  ##
+  debug: false
+
+securityContext:
+  enabled: true
+  fsGroup: 0
+
+containerSecurityContext:
+  enabled: true
+  runAsUser: 0
+
+postgresqlUsername: postgres
+
+postgresqlPassword: p0ssw0rd
+
+postgresqlDatabase: postgres
+
+postgresqlDataDir: /postgresql/data
+
+persistence:
+  enabled: false
+  storageClass: local-postgres-bc-storage
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  annotations: {}
