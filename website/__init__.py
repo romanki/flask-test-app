@@ -8,7 +8,7 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'rfvtgbyhn edcrfvtgb'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:p0ssw0rd@localhost/postgres'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:p0ssw0rd@db:5432/postgres'
     # Pooling control
     app.config['SQLALCHEMY_POOL_SIZE'] = 10
     # logging of DB connection
