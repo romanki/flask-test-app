@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
+# 1
+# 2
+
 set -x
 set -e
 
