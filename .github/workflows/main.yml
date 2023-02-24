@@ -18,7 +18,7 @@ jobs:
         id: changed-files-root
         uses: tj-actions/changed-files@v35
         with:
-          files: **/* # Alternatively using: `docs/**` or `docs`
+          files: **/*.* # Alternatively using: `docs/**` or `docs`
 
 
       - name: Get changed files
