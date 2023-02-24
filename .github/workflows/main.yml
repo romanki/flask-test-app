@@ -30,6 +30,6 @@ jobs:
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
-          SHARED_FILES=$(echo ${{ steps.changed-files-root.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|non-prod|^\\.$)).)*$")) ]')
+          SHARED_FILES=$(echo ${{ steps.changed-files-root.outputs.all_changed_and_modified_files }} # | jq '[ .[] | select(test("^((?!(prod|non-prod|^\\.$)).)*$")) ]')
           echo $SHARED_FILES
           #echo "::set-output name=list::${SHARED_FILES}"
