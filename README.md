@@ -46,3 +46,5 @@ To access to k8s services need ingress and services configs in your kubernetes c
 minikube service --url flask-test-app
 ```
 And use URL provided, for example: http://127.0.0.1:59786
+
+## test changes
