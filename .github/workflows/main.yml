@@ -18,8 +18,8 @@ jobs:
         id: changed-files-all
         uses: tj-actions/changed-files@v35
         with:
-          dir_names: true
-          dir_names_max_depth: 2
+          # dir_names: true
+          # dir_names_max_depth: 2
           json: true
           # files_ignore: |
           #   prod
@@ -56,6 +56,6 @@ jobs:
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
-          ALL_FILES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|non-prod)).)*$")) ]')
+          ALL_FILES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ]' )
           echo "all ALL_FILES files changed: $ALL_FILES"
           echo "::set-output name=list::${ALL_FILES}"
