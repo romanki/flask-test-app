@@ -15,13 +15,15 @@ jobs:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
 
       - name: Get changed ALL files
-        id: changed-files-root
+        id: changed-files-all
         uses: tj-actions/changed-files@v35
         with:
           # dir_names: true
           # dir_names_max_depth: 2
           json: true
-          #files: prod, non-prod
+          files_ignore: |
+            prod
+            non-prod
 
       - name: Get changed Domain files
         id: changed-files-domain
@@ -30,20 +32,22 @@ jobs:
           # dir_names: true
           # dir_names_max_depth: 2
           json: true
-          files_ignore: prod, non-prod
+          files: |
+            prod
+            non-prod
 
       - name: List all changed files
         run: |
-          for file in ${{ steps.changed-files-root.outputs.all_changed_files }}; do
+          for file in ${{ steps.changed-files-all.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
 
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
-          SHARED_FILES=$(echo ${{ steps.changed-files-root.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|non-prod)).)*$")) ]')
-          ENV_FILES=$(echo ${{ steps.changed-files.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]')
-          DOMAIN_FILES=$(echo ${{ steps.changed-files.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]')
+          SHARED_FILES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|non-prod)).)*$")) ]')
+          ENV_FILES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]')
+          DOMAIN_FILES=$(echo ${{ steps.changed-files-domain.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]')
           echo "all SHARED files changed: $SHARED_FILES"
           echo "all ENV files changed: $ENV_FILES"
           echo "all DOMAIN files changed: $DOMAIN_FILES"
