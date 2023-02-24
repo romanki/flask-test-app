@@ -7,7 +7,7 @@ on:
       
 jobs:
   get_changed_folders:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     outputs:
       changed_folders: ${{ steps.get_changed_folders.outputs.list }}
     steps:
