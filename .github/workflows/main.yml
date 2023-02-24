@@ -18,7 +18,7 @@ jobs:
         id: changed-files-root
         uses: tj-actions/changed-files@v35
         with:
-          dir_names_max_depth: 1
+          dir_names_max_depth: 0
 
       - name: Get changed files
         id: changed-files-envs
