@@ -1,0 +1,21 @@
+name: Autoplan
+
+on:
+  push:
+    branches:
+      - main
+      
+jobs:
+  get_changed_folders:
+    runs-on: ${{github.repository}}
+    outputs:
+      changed_folders: ${{ steps.get_changed_folders.outputs.list }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+      - name: get changed
+        uses: tj-actions/changed-files@v35.5.6
+        with:
+          dir_names: true
+          dir_names_max_depth: 2
+          json: true
