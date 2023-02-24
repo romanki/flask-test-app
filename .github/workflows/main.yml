@@ -21,6 +21,16 @@ jobs:
           # dir_names: true
           # dir_names_max_depth: 2
           json: true
+          #files: prod, non-prod
+
+      - name: Get changed Domain files
+        id: changed-files-domain
+        uses: tj-actions/changed-files@v35
+        with:
+          # dir_names: true
+          # dir_names_max_depth: 2
+          json: true
+          files_ignore: prod, non-prod
 
       - name: List all changed files
         run: |
@@ -32,5 +42,9 @@ jobs:
         id: get_changed_folders
         run: |
           SHARED_FILES=$(echo ${{ steps.changed-files-root.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|non-prod)).)*$")) ]')
-          echo "all shared files changed: $SHARED_FILES"
+          ENV_FILES=$(echo ${{ steps.changed-files.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]')
+          DOMAIN_FILES=$(echo ${{ steps.changed-files.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]')
+          echo "all SHARED files changed: $SHARED_FILES"
+          echo "all ENV files changed: $ENV_FILES"
+          echo "all DOMAIN files changed: $DOMAIN_FILES"
           echo "::set-output name=list::${SHARED_FILES}"
