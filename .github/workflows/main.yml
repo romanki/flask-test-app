@@ -18,34 +18,9 @@ jobs:
         id: changed-files-all
         uses: tj-actions/changed-files@v35
         with:
-          # dir_names: true
-          # dir_names_max_depth: 2
+          dir_names: true
+          dir_names_max_depth: 2
           json: true
-          # files_ignore: |
-          #   prod
-          #   non-prod
-
-      # - name: Get changed ENV files
-      #   id: changed-files-env
-      #   uses: tj-actions/changed-files@v35
-      #   with:
-      #     dir_names: true
-      #     dir_names_max_depth: 2
-      #     json: true
-      #     files: |
-      #       prod/**
-      #       non-prod/**
-
-      # - name: Get changed DOMAIN files
-      #   id: changed-files-domain
-      #   uses: tj-actions/changed-files@v35
-      #   with:
-      #     # dir_names: true
-      #     # dir_names_max_depth: 2
-      #     json: true
-      #     files: |
-      #       prod/**/*
-      #       non-prod/**/*
 
       - name: List all changed files
         run: |
@@ -56,6 +31,43 @@ jobs:
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
-          ALL_FILES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ]' )
-          echo "all ALL_FILES files changed: $ALL_FILES"
-          echo "::set-output name=list::${ALL_FILES}"
+          set -x
+          DOMAIN=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
+          ENVI=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
+          SHARED=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ] | length' )
+          echo "DOMAIN: $DOMAIN"
+          echo "ENVI: $ENVI"
+          echo "SHARED: $SHARED"
+          shared () {
+            #Create a json array that includes all domains for all environments
+            for k in non-prod prod; do
+              for folder in $(ls -1p $k/| grep '/$'); do
+                echo "${k}/$folder";
+              done;
+            #This line converts output to json and use \n as separator for creating array elements
+            done | jq -R -s -c 'split("\n")[:-1]' > shared-temp.json
+            FOLDERS=$(cat shared-temp.json)
+          }
+          envi () {
+            for folder in $( $ENVI ); do
+              echo "${folder}";
+            done | jq -R -s -c 'split("\n")[:-1]' > envi-temp.json
+            FOLDERS=$(cat envi-temp.json)
+          }
+          domain () {
+            for domain in $( $DOMAIN ); do
+              echo "${domain}";
+            done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
+            FOLDERS=$(cat domain-temp.json)
+          }
+          # if [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
+          #   domain
+          # elif [ ! -z "${ENVI}" ]; then
+          #   envi
+          # elif [ ! -z "${SHARED}" ]; then
+          #   shared
+          # else
+          #   echo "no changes"
+          # fi
+          echo "all FOLDERS files changed: $FOLDERS"
+          echo "::set-output name=list::${FOLDERS}"
