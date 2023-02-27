@@ -32,6 +32,7 @@ jobs:
         id: get_changed_folders
         run: |
           set -x
+          echo Check files var: ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }}
           DOMAIN=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
           ENVI=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
           SHARED=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ] | length' )
@@ -49,8 +50,8 @@ jobs:
             FOLDERS=$(cat shared-temp.json)
           }
           envi () {
-            for folder in $( $ENVI ); do
-              echo "${folder}";
+            for folder in $( echo ${ENVI} | jq -r '.[]' ); do
+              echo ${folder} | cut -d "/" -f1,2;
             done | jq -R -s -c 'split("\n")[:-1]' > envi-temp.json
             FOLDERS=$(cat envi-temp.json)
           }
@@ -60,6 +61,9 @@ jobs:
             done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
             FOLDERS=$(cat domain-temp.json)
           }
+          # domain
+          envi
+          # shared
           # if [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
           #   domain
           # elif [ ! -z "${ENVI}" ]; then
