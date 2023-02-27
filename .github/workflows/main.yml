@@ -19,58 +19,43 @@ jobs:
         uses: tj-actions/changed-files@v35
         with:
           dir_names: true
-          dir_names_max_depth: 2
+          dir_names_max_depth: 3
           json: true
-
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files-all.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
 
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
-          echo Check files var: ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }}
-          DOMAIN=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
-          ENVI=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
-          SHARED=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ] | length' )
-          echo "DOMAIN: $DOMAIN"
-          echo "ENVI: $ENVI"
-          echo "SHARED: $SHARED"
-          shared () {
-            #Create a json array that includes all domains for all environments
-            for k in non-prod prod; do
-              for folder in $(ls -1p $k/| grep '/$'); do
-                echo "${k}/$folder";
-              done;
-            #This line converts output to json and use \n as separator for creating array elements
-            done | jq -R -s -c 'split("\n")[:-1]' > shared-temp.json
-            FOLDERS=$(cat shared-temp.json)
-          }
-          envi () {
+          CHANGES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }})
+          echo "Check files var: ${CHANGES}"
+          DOMAIN=$(echo ${CHANGES} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
+          ENVI=$(echo ${CHANGES} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
+          SHARED=$(echo ${CHANGES} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ] | length' )
+          SHARED_FILES=$(echo ${CHANGES} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ]')
+          echo "DOMAIN: ${DOMAIN}"
+          echo "ENVI: ${ENVI}"
+          echo "SHARED: ${SHARED}"
+          echo "Shared files: ${SHARED_FILES}"
+          if [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
+            for domain in $( ${DOMAIN} ); do
+              echo "${domain}";
+            done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
+            FOLDERS=$(cat domain-temp.json)
+          elif [ ! -z "${ENVI}" || [ "${ENVI}" -ne 0 ]; then
             for folder in $( echo ${ENVI} | jq -r '.[]' ); do
               echo ${folder} | cut -d "/" -f1,2;
             done | jq -R -s -c 'split("\n")[:-1]' > envi-temp.json
             FOLDERS=$(cat envi-temp.json)
-          }
-          domain () {
-            for domain in $( $DOMAIN ); do
-              echo "${domain}";
-            done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
-            FOLDERS=$(cat domain-temp.json)
-          }
-          # domain
-          envi
-          # shared
-          # if [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
-          #   domain
-          # elif [ ! -z "${ENVI}" ]; then
-          #   envi
-          # elif [ ! -z "${SHARED}" ]; then
-          #   shared
-          # else
-          #   echo "no changes"
-          # fi
-          echo "all FOLDERS files changed: $FOLDERS"
+          elif [ ! -z "${SHARED}" || [ "${SHARED}" -ne 0 ]; then
+            #Create a json array that includes all domains for all environments
+            for k in non-prod prod; do
+              for folder in $(ls -1p $k/| grep '/$'); do
+                  echo "${k}/$folder";
+              done;
+            #This line converts output to json and use \n as separator for creating array elements
+            done | jq -R -s -c 'split("\n")[:-1]' > shared-temp.json
+            FOLDERS=$(cat shared-temp.json)
+          else
+            echo "no changes"
+          fi
+          echo "all FOLDERS files changed: ${FOLDERS}"
           echo "::set-output name=list::${FOLDERS}"
