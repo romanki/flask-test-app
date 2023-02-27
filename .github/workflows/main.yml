@@ -36,17 +36,7 @@ jobs:
           echo "ENVI: ${ENVI}"
           echo "SHARED: ${SHARED}"
           echo "Shared files: ${SHARED_FILES}"
-          if [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
-            for dom in $( echo "${DOMAIN}" ); do
-              echo "${dom}";
-            done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
-            FOLDERS=$(cat domain-temp.json)
-          elif [ ! -z "${ENVI}" || [ "${ENVI}" -ne 0 ]; then
-            for folder in $( echo ${ENVI} | jq -r '.[]' ); do
-              echo ${folder} | cut -d "/" -f1,2;
-            done | jq -R -s -c 'split("\n")[:-1]' > envi-temp.json
-            FOLDERS=$(cat envi-temp.json)
-          elif [ ! -z "${SHARED}" || [ "${SHARED}" -ne 0 ]; then
+          if [ ! -z "${SHARED}" ] || [ "${SHARED}" -ne 0 ]; then
             #Create a json array that includes all domains for all environments
             for k in non-prod prod; do
               for folder in $(ls -1p $k/| grep '/$'); do
@@ -55,6 +45,16 @@ jobs:
             #This line converts output to json and use \n as separator for creating array elements
             done | jq -R -s -c 'split("\n")[:-1]' > shared-temp.json
             FOLDERS=$(cat shared-temp.json)
+          elif [ ! -z "${ENVI}" || [ "${ENVI}" -ne 0 ]; then
+            for folder in $( echo ${ENVI} | jq -r '.[]' ); do
+              echo ${folder} | cut -d "/" -f1,2;
+            done | jq -R -s -c 'split("\n")[:-1]' > envi-temp.json
+            FOLDERS=$(cat envi-temp.json)
+          elif [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
+            for dom in $( echo "${DOMAIN}" ); do
+              echo "${dom}";
+            done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
+            FOLDERS=$(cat domain-temp.json)
           else
             echo "no changes"
           fi
