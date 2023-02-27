@@ -27,11 +27,11 @@ jobs:
         run: |
           set -x
           CHANGES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }})
-          echo "Check files var: ${CHANGES}"
-          DOMAIN=$(echo ${CHANGES} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
-          ENVI=$(echo ${CHANGES} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
-          SHARED=$(echo ${CHANGES} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ] | length' )
-          SHARED_FILES=$(echo ${CHANGES} | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ]')
+          echo "All changes: ${CHANGES}"
+          DOMAIN=$(echo ${CHANGES}        | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
+          ENVI=$(echo ${CHANGES}          | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
+          SHARED=$(echo ${CHANGES}        | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ] | length' )
+          SHARED_FILES=$(echo ${CHANGES}  | jq '[ .[] | select(test("^((?!(prod|CODEOWNERS|README|templates|^\\.$)).)*$")) ]')
           echo "DOMAIN: ${DOMAIN}"
           echo "ENVI: ${ENVI}"
           echo "SHARED: ${SHARED}"
@@ -58,5 +58,5 @@ jobs:
           else
             echo "no changes"
           fi
-          echo "matrix for files changed: ${FOLDERS}"
+          echo "all FOLDERS files changed: ${FOLDERS}"
           echo "::set-output name=list::${FOLDERS}"
