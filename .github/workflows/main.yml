@@ -31,7 +31,6 @@ jobs:
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
-          set -x
           echo Check files var: ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }}
           DOMAIN=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
           ENVI=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
