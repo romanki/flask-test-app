@@ -25,6 +25,7 @@ jobs:
       - name: Filter folders for matrix
         id: get_changed_folders
         run: |
+          set -x
           CHANGES=$(echo ${{ steps.changed-files-all.outputs.all_changed_and_modified_files }})
           echo "Check files var: ${CHANGES}"
           DOMAIN=$(echo ${CHANGES} | jq -c '[ .[] | select(test("^(non-)?prod")) ]' )
@@ -36,8 +37,8 @@ jobs:
           echo "SHARED: ${SHARED}"
           echo "Shared files: ${SHARED_FILES}"
           if [ ! -z "${DOMAIN}" ] || [ "${DOMAIN}" -ne 0 ]; then
-            for domain in $( ${DOMAIN} ); do
-              echo "${domain}";
+            for dom in $( echo "${DOMAIN}" ); do
+              echo "${dom}";
             done | jq -R -s -c 'split("\n")[:-1]' > domain-temp.json
             FOLDERS=$(cat domain-temp.json)
           elif [ ! -z "${ENVI}" || [ "${ENVI}" -ne 0 ]; then
@@ -59,3 +60,4 @@ jobs:
           fi
           echo "all FOLDERS files changed: ${FOLDERS}"
           echo "::set-output name=list::${FOLDERS}"
+
