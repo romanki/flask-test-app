@@ -60,4 +60,3 @@ jobs:
           fi
           echo "matrix for files changed: ${FOLDERS}"
           echo "::set-output name=list::${FOLDERS}"
-
