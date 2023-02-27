@@ -58,6 +58,6 @@ jobs:
           else
             echo "no changes"
           fi
-          echo "all FOLDERS files changed: ${FOLDERS}"
+          echo "matrix for files changed: ${FOLDERS}"
           echo "::set-output name=list::${FOLDERS}"
 
